@@ -48,19 +48,19 @@
     },
     methods : {
       clickRecord : function () {
-        this.iconRecord = recordtwo,
-        this.iconOrder = formone,
-        this.iconAccount = accountone
+        this.iconRecord = recordtwo;
+        this.iconOrder = formone;
+        this.iconAccount = accountone;
       },
       clickOrder : function () {
-        this.iconRecord = recordone,
-        this.iconOrder = fromtwo,
-        this.iconAccount = accountone
+        this.iconRecord = recordone;
+        this.iconOrder = fromtwo;
+        this.iconAccount = accountone;
       },
       clickAccount : function () {
-        this.iconRecord = recordone,
-        this.iconOrder = formone,
-        this.iconAccount = accounttwo
+        this.iconRecord = recordone;
+        this.iconOrder = formone;
+        this.iconAccount = accounttwo;
       }
     }
   }
