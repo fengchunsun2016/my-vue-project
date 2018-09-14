@@ -1,6 +1,3 @@
-/**
- * Created by feng on 2018/6/19.
- */
 
 <template>
  <div id="my-form">
