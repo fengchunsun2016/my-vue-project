@@ -14,19 +14,19 @@
         客户信息
       </div>
       <ul class="info" id="custom-info">
-        <li class="item custom-name">
+        <li class="item custom-name" v-if="data.formName==1">
           <div class="left name">姓名</div>
           <input type="text" id="custom-name" placeholder="请输入姓名" v-model="name">
         </li>
-        <li class="item custom-id">
+        <li class="item custom-id" v-if="data.formIdCard==1">
           <div class="left id">身份证号码</div>
           <input type="text" id="custom-id" placeholder="请输入身份证号" v-model="idCard">
         </li>
-        <li class="item custom-phone">
+        <li class="item custom-phone" v-if="data.formPhone==1">
           <div class="left phone">手机号码</div>
           <input type="text" id="custom-phone" placeholder="请输入银行预留手机号" v-model="phoneNum">
         </li>
-        <li class="item custom-identify">
+        <li class="item custom-identify" v-if="data.formSms">
           <input type="text" placeholder="请输入验证码" id="custom-identify" v-model="smsCode">
           <div class="get-custom-identify" id="get-custom-identify"><span class="line"></span> <p id="time_">获取验证码</p></div>
         </li>
@@ -34,7 +34,7 @@
     </div>
 
     <div class="ticket" id="custom-ticket">
-      <!--<div class="tittle">
+      <div class="tittle">
         券码信息
       </div>
 
@@ -46,9 +46,9 @@
           <li class="dianzi active">
             电子券
           </li>
-          <li class="meitong">
+          <!--<li class="meitong">
             美通卡
-          </li>
+          </li>-->
         </ul>
       </div>
 
@@ -57,21 +57,21 @@
           <div class="left">券码面值</div>
           <div class="right">数量</div>
         </div>
-        <div class="list-item item">
+        <div class="list-item item" v-for="item in data.formTicketList">
+          <div class="left">{{item.amount}}元</div>
+          <input type="text" class="right" placeholder="输入兑换张数" ticket-code="item.formTicketCode">
+        </div>
+        <!--<div class="list-item item">
           <div class="left">100元</div>
           <input type="text" class="right" placeholder="输入兑换张数" ticket-code=${item.formTicketCode}>
         </div>
         <div class="list-item item">
           <div class="left">100元</div>
           <input type="text" class="right" placeholder="输入兑换张数" ticket-code=${item.formTicketCode}>
-        </div>
-        <div class="list-item item">
-          <div class="left">100元</div>
-          <input type="text" class="right" placeholder="输入兑换张数" ticket-code=${item.formTicketCode}>
-        </div>
+        </div>-->
       </div>
 
-      <div class="list meitong-list" id="meitong-list">
+      <!--<div class="list meitong-list" id="meitong-list">
         <div class="list-item header">
           <div class="left">券码面值</div>
           <div class="right">数量</div>
@@ -97,7 +97,7 @@
 
     </div>
 
-    <div class="date" id="custom-date">
+    <!--<div class="date" id="custom-date">
       <div class="tittle">
         日期
       </div>
@@ -110,25 +110,118 @@
              placeholder="请选择日期"
              data-lcalendar="${dateNow},2030-12-31"
       />
+    </div>-->
+
+    <div v-transfer-dom>
+      <Confirm
+        v-model="confirmShow"
+        @on-cancel="onCancel"
+        @on-confirm="onConfirm"
+        @on-show="onShow"
+        @on-hide="onHide"
+      >确定要保存么？</Confirm>
     </div>
+
+    <Toast
+      v-model="toastShow"
+      type="text"
+    >
+      {{tips}}
+    </Toast>
 
   </div>
 
 </template>
 
 <script>
+  import { XButton, Confirm, Toast, TransferDom } from 'vux';
+  import { get, post } from '../../../../request/index';
+
   export default{
+    name:'record',
+    directives: {
+      TransferDom
+    },
+    components:{
+      XButton,
+      Confirm,
+      Toast,
+    },
     data:function () {
       return {
+        data:{},
         name:'',
         idCard:'',
         phoneNum:'',
-        smsCode:''
+        smsCode:'',
+        confirmShow:false,
+        toastShow:false,
+        tips:'请输入姓名'
       }
     },
-    methods:{
-      saveOrder:function () {
+    created:function () {
+      get({
+        url:'/form',
+      }).then((result)=>{
+        console.log(result,'result');
+        console.log(this,'this');
+        let data = result.data;
+        this.data = data;
 
+      })
+    },
+    methods:{
+      saveOrder: function () {
+        if(this.data.formName==='1' && this.name===''){
+          this.tips = '请输入姓名';
+          this.toastShow = true;
+          return;
+        }
+        if(this.data.formIdCard==='1' && this.idCard===''){
+          this.tips = '请输入身份证号';
+          this.toastShow = true;
+          return;
+        }
+        if(this.data.formPhone==='1' && this.phoneNum===''){
+          this.tips = '请输入手机号';
+          this.toastShow = true;
+          return;
+        }
+        if(this.data.formSms==='1' && this.smsCode===''){
+          this.tips = '请输入验证码';
+          this.toastShow = true;
+          return;
+        }
+        //至少填写一种卡券
+        
+        this.confirmShow = true;
+      },
+      onCancel:function () {
+        //console.log('on-cancel')
+      },
+      onConfirm:function () {
+        // submit提交记录表单
+        let data = {
+          name:this.name,
+          idCard:this.idCard,
+          phoneNum:this.phoneNum,
+          smsCode:this.smsCode,
+        }
+        post({
+          url:'/order/save',
+          data:JSON.stringify(data)
+        }).then((result)=>{
+          let data = result.data;
+          console.log(data,'data');
+
+        })
+
+      },
+      onShow:function () {
+        console.log('on-show')
+      },
+      onHide:function () {
+        console.log('on-hide')
       }
     }
   }

@@ -19,6 +19,7 @@ let get = function ({url,params}) {
 
   return axios.get(baseURL+url,{
     params,
+    timeout:2000,
     headers
   })
 };
@@ -27,6 +28,7 @@ let get = function ({url,params}) {
 let post = function ({url,data}) {
   return axios.post(baseURL+url,{
     data,
+    timeout:2000,
     headers
   })
 };

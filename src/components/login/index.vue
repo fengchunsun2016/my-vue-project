@@ -64,8 +64,9 @@
           if (!username) {
             this.warningFlag = true;
             this.warningText = '请输入账号';
+            //
             AlertModule.show({
-              title: 'VUX is Cool',
+              title: '请输入账号',
               // content: 'Do you agree?',
               onShow () {
                 console.log('Module: I\'m showing')
@@ -79,6 +80,17 @@
           if (!password) {
             this.warningFlag = true;
             this.warningText = '请输入密码';
+            //
+            AlertModule.show({
+              title: '请输入密码',
+              // content: 'Do you agree?',
+              onShow () {
+                console.log('Module: I\'m showing')
+              },
+              onHide () {
+                console.log('Module: I\'m hiding now')
+              }
+            })
           }
         } else {
           this.warningFlag = false;
