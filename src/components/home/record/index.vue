@@ -28,7 +28,11 @@
         </li>
         <li class="item custom-identify" v-if="data.formSms">
           <input type="text" placeholder="请输入验证码" id="custom-identify" v-model="smsCode">
-          <div class="get-custom-identify" id="get-custom-identify"><span class="line"></span> <p id="time_">获取验证码</p></div>
+          <div class="get-custom-identify" id="get-custom-identify">
+            <span class="line"></span>
+            <p @click="getIdentify" v-if="!identifyFlag">{{identifyText}}</p>
+            <p v-if="identifyFlag">{{identifyText}}</p>
+          </div>
         </li>
       </ul>
     </div>
@@ -57,9 +61,9 @@
           <div class="left">券码面值</div>
           <div class="right">数量</div>
         </div>
-        <div class="list-item item" v-for="item in data.formTicketList">
+        <div class="list-item item" v-for="(item,index) in data.formTicketList">
           <div class="left">{{item.amount}}元</div>
-          <input type="text" class="right" placeholder="输入兑换张数" ticket-code="item.formTicketCode">
+          <input type="text" class="right" placeholder="输入兑换张数" :ticket-code="item.formTicketCode" ref="ticketItem">
         </div>
         <!--<div class="list-item item">
           <div class="left">100元</div>
@@ -117,8 +121,6 @@
         v-model="confirmShow"
         @on-cancel="onCancel"
         @on-confirm="onConfirm"
-        @on-show="onShow"
-        @on-hide="onHide"
       >确定要保存么？</Confirm>
     </div>
 
@@ -149,6 +151,8 @@
     },
     data:function () {
       return {
+        identifyText:'获取验证码',
+        identifyFlag:false,
         data:{},
         name:'',
         idCard:'',
@@ -156,15 +160,15 @@
         smsCode:'',
         confirmShow:false,
         toastShow:false,
-        tips:'请输入姓名'
+        tips:'请输入姓名',
+        count:'',
+
       }
     },
     created:function () {
       get({
         url:'/form',
       }).then((result)=>{
-        console.log(result,'result');
-        console.log(this,'this');
         let data = result.data;
         this.data = data;
 
@@ -172,6 +176,7 @@
     },
     methods:{
       saveOrder: function () {
+
         if(this.data.formName==='1' && this.name===''){
           this.tips = '请输入姓名';
           this.toastShow = true;
@@ -193,7 +198,14 @@
           return;
         }
         //至少填写一种卡券
-        
+        if(this.data.formTicket==='1'){
+          if(!this.$refs.ticketItem.some((item)=>(item.value!==''))){
+            this.tips = '请至少填写一种卡券';
+            this.toastShow = true;
+            return;
+          }
+        }
+
         this.confirmShow = true;
       },
       onCancel:function () {
@@ -201,27 +213,50 @@
       },
       onConfirm:function () {
         // submit提交记录表单
+        let ticketList = [];
+        this.$refs.ticketItem.forEach(function (item,index) {
+          let obj = {};
+          obj.formTicketCode = item.getAttribute('ticket-code');
+          obj.count = item.value;
+          ticketList.push(obj);
+
+        })
         let data = {
           name:this.name,
           idCard:this.idCard,
           phoneNum:this.phoneNum,
           smsCode:this.smsCode,
+          ticketList,
         }
+
+
         post({
           url:'/order/save',
           data:JSON.stringify(data)
         }).then((result)=>{
           let data = result.data;
           console.log(data,'data');
+          if(data.code==='SUCCESS'){
+            this.tips = '保存订单成功';
+            this.toastShow = true;
+          }
 
         })
 
       },
-      onShow:function () {
-        console.log('on-show')
-      },
-      onHide:function () {
-        console.log('on-hide')
+      getIdentify:function () {
+        this.identifyFlag = true;
+        let num = 60;
+        this.identifyText = num;
+        let timer = setInterval(()=> {
+          --num;
+          this.identifyText = num;
+          if(num===0){
+            this.identifyText = '获取验证码';
+            this.identifyFlag = false;
+            clearInterval(timer);
+          }
+        },1000)
       }
     }
   }
