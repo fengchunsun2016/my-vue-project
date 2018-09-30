@@ -245,18 +245,33 @@
 
       },
       getIdentify:function () {
-        this.identifyFlag = true;
-        let num = 60;
-        this.identifyText = num;
-        let timer = setInterval(()=> {
-          --num;
+        if(this.phoneNum!==''){
+          this.identifyFlag = true;
+          let num = 60;
           this.identifyText = num;
-          if(num===0){
-            this.identifyText = '获取验证码';
-            this.identifyFlag = false;
-            clearInterval(timer);
-          }
-        },1000)
+          let timer = setInterval(()=> {
+            --num;
+            this.identifyText = num;
+            if(num===0){
+              this.identifyText = '获取验证码';
+              this.identifyFlag = false;
+              clearInterval(timer);
+            }
+          },1000)
+          post({
+            url:'/sms',
+          }).then((result)=>{
+            let data = result.data;
+            if(data.code==='SUCCESS'){
+              this.tips = '验证码已发送';
+              this.toastShow = true;
+            }
+          })
+        }else{
+          this.tips = '请先填写手机号码';
+          this.toastShow = true;
+        }
+
       }
     }
   }

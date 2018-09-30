@@ -2,27 +2,46 @@
   <div>
     <router-view></router-view>
     <footer>
-      <div class="foot-item record" @click="clickRecord">
-        <router-link to="/record">
+
+
+      <router-link to="/record">
+        <div class="foot-item record" @click="clickRecord">
           <div class="icon"><img :src="iconRecord" alt=""></div>
           <div class="text">记录表单</div>
-        </router-link>
+        </div>
+      </router-link>
 
-      </div>
-      <div class="foot-item my-form" @click="clickOrder">
-        <router-link to="/order">
+
+      <router-link to="/order">
+        <div class="foot-item my-form" @click="clickOrder">
           <div class="icon"><img :src="iconOrder" alt=""></div>
           <div class="text">我的表单</div>
-        </router-link>
+        </div>
+      </router-link>
 
-      </div>
-      <div class="foot-item my-account" @click="clickAccount">
-        <router-link to="account">
+
+      <router-link to="account">
+        <div class="foot-item my-account" @click="clickAccount">
           <div class="icon"><img :src="iconAccount" alt=""></div>
           <div class="text">我的账号</div>
-        </router-link>
+        </div>
+      </router-link>
 
-      </div>
+
+      <!--<router-link to="/record">-->
+      <!--<div class="icon"><img :src="iconRecord" alt=""></div>-->
+      <!--<div class="text">记录表单</div>-->
+      <!--</router-link>-->
+      <!--<router-link to="/order">-->
+      <!--<div class="icon"><img :src="iconOrder" alt=""></div>-->
+      <!--<div class="text">我的表单</div>-->
+      <!--</router-link>-->
+      <!--<router-link to="account">-->
+      <!--<div class="icon"><img :src="iconAccount" alt=""></div>-->
+      <!--<div class="text">我的账号</div>-->
+      <!--</router-link>-->
+
+
     </footer>
   </div>
 
@@ -38,26 +57,44 @@
   import accounttwo from '../../../public/images/accounttwo.png';
 
   export default {
-    name : 'home',
-    data : function () {
+    name: 'home',
+    data: function () {
       return {
-        iconRecord : recordtwo,
-        iconOrder : formone,
-        iconAccount : accountone
+        iconRecord: recordtwo,
+        iconOrder: formone,
+        iconAccount: accountone
       }
     },
-    methods : {
-      clickRecord : function () {
+    created:function () {
+      console.log(this.$route,'$route')
+    },
+    watch:{
+      '$route.path':function (newVal,oldVal) {
+
+        if(newVal==='/record'){
+          console.log(newVal,'newVal')
+          this.clickRecord();
+        }
+        if(newVal==='/order'){
+          this.clickOrder();
+        }
+        if(newVal==='/account'){
+          this.clickAccount();
+        }
+      }
+    },
+    methods: {
+      clickRecord: function () {
         this.iconRecord = recordtwo;
         this.iconOrder = formone;
         this.iconAccount = accountone;
       },
-      clickOrder : function () {
+      clickOrder: function () {
         this.iconRecord = recordone;
         this.iconOrder = fromtwo;
         this.iconAccount = accountone;
       },
-      clickAccount : function () {
+      clickAccount: function () {
         this.iconRecord = recordone;
         this.iconOrder = formone;
         this.iconAccount = accounttwo;
